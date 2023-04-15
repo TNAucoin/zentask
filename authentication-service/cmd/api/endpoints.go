@@ -13,7 +13,7 @@ func makeSignupEndpoint(svc *authenticationService) endpoint.Endpoint {
 		if err != nil {
 			return signUpResponse{Username: req.Username, Email: req.Email, Err: err}, err
 		}
-		return signUpResponse{Username: req.Username, Email: req.Email, CreatedAt: userObject.createdDate, Err: nil}, nil
+		return signUpResponse{Username: req.Username, Email: req.Email, CreatedAt: userObject.CreatedDate, Err: nil}, nil
 
 	}
 }
@@ -23,8 +23,19 @@ func makeSignInEndpoint(svc *authenticationService) endpoint.Endpoint {
 		req := request.(signInRequest)
 		token, err := svc.Signin(req.Email, req.PasswordHash)
 		if err != nil {
-			return signInResponse{"", err.Error()}, nil
+			return signInResponse{"", err}, err
 		}
-		return signInResponse{token, ""}, nil
+		return signInResponse{token, nil}, nil
+	}
+}
+
+func makeRefreshTokenEndpoint(svc *authenticationService) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(refreshTokenRequest)
+		token, err := svc.RefreshToken(req.Jwt)
+		if err != nil {
+			return refreshTokenResponse{"", err}, err
+		}
+		return refreshTokenResponse{token, nil}, nil
 	}
 }

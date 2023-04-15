@@ -28,8 +28,18 @@ type signInRequest struct {
 }
 
 type signInResponse struct {
-	Token string `json:"token"`
-	Err   string `json:"err,omitempty"`
+	Jwt string `json:"jwt"`
+	Err error  `json:"error,omitempty"`
+}
+
+type refreshTokenRequest struct {
+	Jwt string `json:"jwt"`
+	Err error  `json:"error,omitempty"`
+}
+
+type refreshTokenResponse struct {
+	Jwt string `json:"jwt"`
+	Err error  `json:"error,omitempty"`
 }
 
 func decodeSignUpRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -48,6 +58,14 @@ func decodeSignInRequest(_ context.Context, r *http.Request) (interface{}, error
 	return request, nil
 }
 
+func decodeRefreshTokenRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request refreshTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	return request, nil
+}
+
 func encodeSignUpResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	res := response.(signUpResponse)
 	if res.Err != nil {
@@ -58,8 +76,24 @@ func encodeSignUpResponse(_ context.Context, w http.ResponseWriter, response int
 	return json.NewEncoder(w).Encode(res)
 }
 
-func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
-	return json.NewEncoder(w).Encode(response)
+func encodeSignInResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	res := response.(signInResponse)
+	if res.Err != nil {
+		return json.NewEncoder(w).Encode(res.Err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	return json.NewEncoder(w).Encode(res)
+}
+
+func encodeRefreshTokenReponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+	res := response.(refreshTokenResponse)
+	if res.Err != nil {
+		return json.NewEncoder(w).Encode(res.Err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	return json.NewEncoder(w).Encode(res)
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
@@ -67,6 +101,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case ErrUserExists:
 		w.WriteHeader(http.StatusConflict)
+	case ErrFailedLogin:
+		w.WriteHeader(http.StatusBadRequest)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

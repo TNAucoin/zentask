@@ -21,7 +21,16 @@ func CreateSignInHandler(svc *authenticationService) *httptransport.Server {
 	return httptransport.NewServer(
 		makeSignInEndpoint(svc),
 		decodeSignInRequest,
-		encodeResponse,
+		encodeSignInResponse,
+		options...,
+	)
+}
+
+func CreateRefreshTokenHandler(svc *authenticationService) *httptransport.Server {
+	return httptransport.NewServer(
+		makeRefreshTokenEndpoint(svc),
+		decodeRefreshTokenRequest,
+		encodeRefreshTokenReponse,
 		options...,
 	)
 }
