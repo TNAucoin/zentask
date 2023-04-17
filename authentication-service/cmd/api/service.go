@@ -41,16 +41,10 @@ func (as *authenticationService) Signup(email string, username string, passwordH
 
 func (as *authenticationService) Signin(email, passwordHash string) (string, error) {
 	var user models.User
-	for _, u := range userList {
+	if result := as.DB.Where("email = ?", email).First(&user); result.Error != nil {
+		return "", ErrUserNotFound
+	}
 
-		if u.Email == email {
-			user = u
-		}
-	}
-	// return error if we didn't find the user by email
-	if user.Email == "" {
-		return "", ErrFailedLogin
-	}
 	//check password sha matches
 	isValid := user.ValidatePasswordHash(passwordHash)
 
@@ -75,24 +69,16 @@ func (as *authenticationService) RefreshToken(userToken string) (string, error) 
 	return t, nil
 }
 
-// getUserObject returns the found user object from store
-func (as *authenticationService) getUserObject(email string) (models.User, error) {
-	for _, user := range userList {
-		if user.Email == email {
-			return user, ErrUserNotFound
-		}
-	}
-	return models.User{}, nil
-}
-
 // addUserObject creates a new unique user in the store
 func (as *authenticationService) addUserObject(email string, username string, passwordHash string, firstname string, lastname string, role int) (models.User, error) {
 	var user models.User
+
+	// check to see if this email already exists
 	result := as.DB.Where("email = ?", email).First(&user)
 	if result.RowsAffected > 0 {
 		return models.User{}, ErrUserExists
 	}
-
+	// create the user and add them to the DB
 	user = models.User{
 		Email:        email,
 		Username:     username,
