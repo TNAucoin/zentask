@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-func makeSignupEndpoint(svc *authenticationService) endpoint.Endpoint {
+func makeSignupEndpoint(svc authenticationService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(signUpRequest)
 		userObject, err := svc.Signup(req.Email, req.Username, req.PasswordHash, req.FirstName, req.LastName)
@@ -18,7 +18,7 @@ func makeSignupEndpoint(svc *authenticationService) endpoint.Endpoint {
 	}
 }
 
-func makeSignInEndpoint(svc *authenticationService) endpoint.Endpoint {
+func makeSignInEndpoint(svc authenticationService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(signInRequest)
 		token, err := svc.Signin(req.Email, req.PasswordHash)
@@ -29,7 +29,7 @@ func makeSignInEndpoint(svc *authenticationService) endpoint.Endpoint {
 	}
 }
 
-func makeRefreshTokenEndpoint(svc *authenticationService) endpoint.Endpoint {
+func makeRefreshTokenEndpoint(svc authenticationService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(refreshTokenRequest)
 		token, err := svc.RefreshToken(req.Jwt)

@@ -8,7 +8,7 @@ var options = []httptransport.ServerOption{
 	httptransport.ServerErrorEncoder(encodeError),
 }
 
-func CreateSignUpHandler(svc *authenticationService) *httptransport.Server {
+func CreateSignUpHandler(svc authenticationService) *httptransport.Server {
 	return httptransport.NewServer(
 		makeSignupEndpoint(svc),
 		decodeSignUpRequest,
@@ -17,7 +17,7 @@ func CreateSignUpHandler(svc *authenticationService) *httptransport.Server {
 	)
 }
 
-func CreateSignInHandler(svc *authenticationService) *httptransport.Server {
+func CreateSignInHandler(svc authenticationService) *httptransport.Server {
 	return httptransport.NewServer(
 		makeSignInEndpoint(svc),
 		decodeSignInRequest,
@@ -26,7 +26,7 @@ func CreateSignInHandler(svc *authenticationService) *httptransport.Server {
 	)
 }
 
-func CreateRefreshTokenHandler(svc *authenticationService) *httptransport.Server {
+func CreateRefreshTokenHandler(svc authenticationService) *httptransport.Server {
 	return httptransport.NewServer(
 		makeRefreshTokenEndpoint(svc),
 		decodeRefreshTokenRequest,

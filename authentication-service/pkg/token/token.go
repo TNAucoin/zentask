@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/tnaucoin/zentask/authentication-service/models"
+	"github.com/tnaucoin/zentask/authentication-service/pkg/models"
 )
 
+// TODO: this should be hidden
 var jwtKey = []byte("some_secret_key")
 
 var ErrTokenCreationFailed = errors.New("failed to create a jwt")

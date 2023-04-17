@@ -3,7 +3,7 @@ package models
 import "time"
 
 type User struct {
-	Email        string
+	Email        string `gorm:"primaryKey"`
 	Username     string
 	PasswordHash string
 	FirstName    string
