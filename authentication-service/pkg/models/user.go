@@ -3,11 +3,12 @@ package models
 import "time"
 
 type User struct {
-	Email        string `gorm:"primaryKey"`
-	PasswordHash string
+	ID           uint
+	Email        string `gorm:"unique;not null"`
+	PasswordHash string `gorm:"not null"`
 	FirstName    string
 	LastName     string
-	CreatedDate  time.Time
+	CreatedAt    time.Time
 }
 
 // validatePasswordHash validates that the password hashes match

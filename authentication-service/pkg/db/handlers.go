@@ -25,8 +25,8 @@ func (h *Handler) FindUser(email string) (models.User, error) {
 }
 
 func (h *Handler) CheckIfUserExists(email string) (bool, error) {
-	user := models.User{Email: email}
-	result := h.DB.Limit(1).First(&user)
+	user := models.User{}
+	result := h.DB.Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return false, nil

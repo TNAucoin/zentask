@@ -30,13 +30,7 @@ reset-auth-service-db:
 	sleep 10
 
 	docker exec -it $$(docker-compose ps -q) psql -U postgres -c "DROP TABLE IF EXISTS users;"
-	docker exec -it $$(docker-compose ps -q) psql -U postgres -c "CREATE TABLE users ( \
-		email VARCHAR(255) PRIMARY KEY, \
-		password_hash VARCHAR(255) NOT NULL, \
-		first_name VARCHAR(255) NOT NULL, \
-		last_name VARCHAR(255) NOT NULL, \
-		created_at TIMESTAMP NOT NULL \
-	);"
+	docker exec -it $$(docker-compose ps -q) psql -U postgres -c "CREATE TABLE users();"
 
 	@echo "Done."
 

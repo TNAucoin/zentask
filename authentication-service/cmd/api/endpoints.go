@@ -13,7 +13,7 @@ func makeSignupEndpoint(svc authenticationService) endpoint.Endpoint {
 		if err != nil {
 			return signUpResponse{Username: req.Username, Email: req.Email, Err: err}, err
 		}
-		return signUpResponse{Username: req.Username, Email: req.Email, CreatedAt: userObject.CreatedDate, Err: nil}, nil
+		return signUpResponse{Username: req.Username, Email: req.Email, CreatedAt: userObject.CreatedAt, Err: nil}, nil
 
 	}
 }

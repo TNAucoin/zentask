@@ -90,7 +90,7 @@ func (as *authenticationService) addUserObject(email string, username string, pa
 		PasswordHash: passwordHash,
 		FirstName:    firstname,
 		LastName:     lastname,
-		CreatedDate:  time.Now(),
+		CreatedAt:    time.Now(),
 	}
 
 	result, err := as.DBHandler.CreateUser(user)
