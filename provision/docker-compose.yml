@@ -1,17 +1,23 @@
 version: '3.8'
 
 services:
-  db:
+  auth-service-db:
     image: postgres:13
     restart: always
     environment:
       POSTGRES_PASSWORD: password
-      POSTGRES_USER: pg
+      POSTGRES_USER: postgres
       POSTGRES_DB: users
     ports:
       - 5432:5432
     volumes:
-      - ./db_data/postgres:/var/lib/postgresql/data
+      - auth_service_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "pg" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   authentication-service:
     build:
@@ -20,3 +26,12 @@ services:
     restart: always
     ports:
       - "8080:80"
+    environment:
+      DSN: "host=auth-service-db port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+    depends_on:
+      auth-service-db:
+        condition: service_healthy
+
+volumes:
+  auth_service_db_data:
+    name: auth_service_db_data

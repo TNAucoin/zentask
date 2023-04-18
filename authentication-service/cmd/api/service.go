@@ -4,9 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/tnaucoin/zentask/authentication-service/pkg/db"
 	"github.com/tnaucoin/zentask/authentication-service/pkg/models"
 	"github.com/tnaucoin/zentask/authentication-service/pkg/token"
-	"gorm.io/gorm"
 )
 
 var ErrUserExists = errors.New("user already exists")
@@ -20,10 +20,10 @@ type AuthenticationService interface {
 }
 
 type authenticationService struct {
-	DB *gorm.DB
+	DBHandler *db.Handler
 }
 
-func Init(db *gorm.DB) authenticationService {
+func Init(db *db.Handler) authenticationService {
 	return authenticationService{db}
 }
 
@@ -41,7 +41,8 @@ func (as *authenticationService) Signup(email string, username string, passwordH
 
 func (as *authenticationService) Signin(email, passwordHash string) (string, error) {
 	var user models.User
-	if result := as.DB.Where("email = ?", email).First(&user); result.Error != nil {
+	user, err := as.DBHandler.FindUser(email)
+	if err != nil {
 		return "", ErrUserNotFound
 	}
 
@@ -74,24 +75,29 @@ func (as *authenticationService) addUserObject(email string, username string, pa
 	var user models.User
 
 	// check to see if this email already exists
-	result := as.DB.Where("email = ?", email).First(&user)
-	if result.RowsAffected > 0 {
+	userExists, err := as.DBHandler.CheckIfUserExists(email)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if userExists {
 		return models.User{}, ErrUserExists
 	}
+
 	// create the user and add them to the DB
 	user = models.User{
 		Email:        email,
-		Username:     username,
 		PasswordHash: passwordHash,
 		FirstName:    firstname,
 		LastName:     lastname,
 		CreatedDate:  time.Now(),
-		Role:         0,
 	}
 
-	if result := as.DB.Create(&user); result.Error != nil {
-		return models.User{}, result.Error
+	result, err := as.DBHandler.CreateUser(user)
+
+	if err != nil {
+		return models.User{}, err
 	}
 
-	return user, nil
+	return result, nil
 }

@@ -15,7 +15,7 @@ var ErrTokenCreationFailed = errors.New("failed to create a jwt")
 var ErrInvalidToken = errors.New("invalid token")
 
 type Claims struct {
-	Username string `json:"username"`
+	Email string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -23,7 +23,7 @@ func GenerateToken(user models.User) (string, error) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 
 	claims := &Claims{
-		Username: user.Username,
+		Email: user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
